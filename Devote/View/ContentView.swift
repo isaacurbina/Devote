@@ -14,9 +14,8 @@ struct ContentView: View {
 	// MARK: - property
 	
 	@State var task: String = ""
-	private var isButtonDisabled: Bool {
-		task.isEmpty
-	}
+	@State private var showNewTaskItem: Bool = false
+	
 	// fetching data
 	@Environment(\.managedObjectContext) private var viewContext
 	@FetchRequest(
@@ -30,30 +29,42 @@ struct ContentView: View {
 	var body: some View {
 		NavigationView {
 			ZStack {
+				
+				
+				// MARK: - main view
+				
 				VStack{
-					VStack(spacing: 16) {
-						
-						TextField("New Task", text: $task)
-							.padding()
-							.background(Color(UIColor.systemGray6))
-							.cornerRadius(10)
-						
-						Button(action: {
-							addItem()
-						}) {
-							Spacer()
-							Text("SAVE")
-							Spacer()
-						} // Button
-						.disabled(isButtonDisabled)
-						.padding()
-						.font(.headline)
-						.foregroundColor(.white)
-						.background(isButtonDisabled ? .gray : .pink)
-						.cornerRadius(10)
-						
-					} // VStack
-					.padding()
+					
+					
+					// MARK: - header
+					
+					Spacer(minLength: 80)
+					
+					
+					// MARK: - new task button
+					
+					Button(action: {
+						showNewTaskItem = true
+					}) {
+						Image(systemName: "plus.circle")
+							.font(.system(size: 30, weight: .semibold, design: .rounded))
+						Text("New Task")
+							.font(.system(size: 24, weight: .bold, design: .rounded))
+					}
+					.foregroundColor(.white)
+					.padding(.horizontal, 20)
+					.padding(.vertical, 15)
+					.background(
+						LinearGradient(gradient: Gradient(colors: [Color.pink, Color.blue]), startPoint: .leading, endPoint: .trailing)
+							.clipShape(Capsule())
+					)
+					.shadow(
+						color: Color(red: 0, green: 0, blue: 0, opacity: 0.25), radius: 8, x: 0.0, y: 4.0
+					)
+					
+					
+					// MARK: - tasks
+					
 					
 					List {
 						ForEach(items) { item in
@@ -92,6 +103,20 @@ struct ContentView: View {
 					.frame(maxWidth: 640)
 					
 				} // VStack
+				
+				
+				// MARK: - new task item
+				
+				if showNewTaskItem {
+					BlankView()
+						.onTapGesture {
+							withAnimation() {
+								showNewTaskItem = false
+							}
+						}
+					NewTaskItemView(isShowing: $showNewTaskItem)
+				}
+				
 			} // ZStack
 			.onAppear() {
 				UITableView.appearance().backgroundColor = UIColor.clear
@@ -116,25 +141,7 @@ struct ContentView: View {
 	
 	// MARK: - functions
 	
-	private func addItem() {
-		withAnimation {
-			let newItem = Item(context: viewContext)
-			newItem.timestamp = Date()
-			newItem.task = task
-			newItem.completion = false
-			newItem.id = UUID()
-			
-			do {
-				try viewContext.save()
-			} catch {
-				let nsError = error as NSError
-				fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-			}
-			
-			task = ""
-			hideKeyboard()
-		}
-	}
+	
 	
 	private func deleteItems(offsets: IndexSet) {
 		withAnimation {
