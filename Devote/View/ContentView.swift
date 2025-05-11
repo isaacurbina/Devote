@@ -15,6 +15,7 @@ struct ContentView: View {
 	
 	@State var task: String = ""
 	@State private var showNewTaskItem: Bool = false
+	@AppStorage("isDarkMode") private var isDarkMode: Bool = false
 	
 	// fetching data
 	@Environment(\.managedObjectContext) private var viewContext
@@ -37,6 +38,38 @@ struct ContentView: View {
 					
 					
 					// MARK: - header
+					
+					HStack(spacing: 10) {
+						
+						// title
+						Text("Devore")
+							.font(.system(.largeTitle, design: .rounded))
+							.fontWeight(.heavy)
+							.padding(.leading, 4)
+						
+						// edit button
+						EditButton()
+							.font(.system(size: 16, weight: .semibold, design: .rounded))
+							.padding(.horizontal, 10)
+							.frame(minWidth: 70, minHeight: 24)
+							.background(
+								Capsule().stroke(.white, lineWidth: 2)
+							)
+						
+						// appearance button
+						Button(action: {
+							// toggle appearance
+							isDarkMode.toggle()
+						}) {
+							Image(systemName: isDarkMode ? "moon.circle.fill" : "moon.circle")
+								.resizable()
+								.frame(width: 24, height: 24)
+								.font(.system(.title, design: .rounded))
+						}
+						
+					} // HStack
+					.padding()
+					.foregroundColor(.white)
 					
 					Spacer(minLength: 80)
 					
@@ -121,12 +154,7 @@ struct ContentView: View {
 			.onAppear() {
 				UITableView.appearance().backgroundColor = UIColor.clear
 			}
-			.navigationBarTitle("Daily Tasks", displayMode: .large)
-			.toolbar {
-				ToolbarItem(placement: .navigationBarLeading) {
-					EditButton()
-				}
-			} // toolbar
+			.navigationBarHidden(true)
 			.background(
 				BackgroundImageView()
 			)
@@ -140,8 +168,6 @@ struct ContentView: View {
 	
 	
 	// MARK: - functions
-	
-	
 	
 	private func deleteItems(offsets: IndexSet) {
 		withAnimation {
