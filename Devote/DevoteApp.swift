@@ -14,6 +14,7 @@ struct DevoteApp: App {
 	// MARK: - properties
 	
 	let persistenceController = PersistenceController.shared
+	@AppStorage("isDarkMode") var isDarkMode: Bool = false
 	
 	
 	// MARK: - body
@@ -22,6 +23,7 @@ struct DevoteApp: App {
 		WindowGroup {
 			ContentView()
 				.environment(\.managedObjectContext, persistenceController.container.viewContext)
+				.preferredColorScheme(isDarkMode ? .dark : .light)
 		}
 	}
 }
