@@ -113,17 +113,23 @@ struct ContentView: View {
 					.frame(maxWidth: 640)
 					
 				} // VStack
+				.blur(radius: showNewTaskItem ? 8.0 : 0, opaque: false)
+				.transition(.move(edge:.bottom))
+				.animation(.easeOut(duration: 0.5))
 				
 				
 				// MARK: - new task item
 				
 				if showNewTaskItem {
-					BlankView()
-						.onTapGesture {
-							withAnimation() {
-								showNewTaskItem = false
-							}
+					BlankView(
+						backgroundColor: isDarkMode ?.black : .white,
+						backgroundOpacity: isDarkMode ? 0.3 : 0.5
+					)
+					.onTapGesture {
+						withAnimation() {
+							showNewTaskItem = false
 						}
+					}
 					NewTaskItemView(isShowing: $showNewTaskItem)
 				}
 				
@@ -134,6 +140,7 @@ struct ContentView: View {
 			.navigationBarHidden(true)
 			.background(
 				BackgroundImageView()
+					.blur(radius: showNewTaskItem ? 8.0 : 0, opaque: false)
 			)
 			.background(
 				backgroundGradient.ignoresSafeArea(.all)
